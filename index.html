@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Interactive Data Dashboard</h1>
+    </header>
+    
+    <div class="auth-container" id="authContainer">
+        <div class="auth-form">
+            <h2>*Login Form*</h2>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input id="username" type="text" placeholder="Enter your username" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input id="Email" type="email" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="contact">Contact</label>
+                <input id="contact" type="tel" placeholder="Enter your contact" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input id="password" type="password" placeholder="Enter your password" required>
+            </div>
+            <div class="form-actions">
+                <button id="loginBtn">Login</button>
+            </div>
+        </div>
+    </div>
+
+   
+    <div class="container" id="dashboard" style="display: none;">
+        <div class="filters">
+            <div class="filter-group">
+                <label for="ageFilter">Age:</label>
+                <select id="ageFilter">
+                    <option value="15-25">15-25</option>
+                    <option value=">25">>25</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="genderFilter">Gender:</label>
+                <select id="genderFilter">
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="dateRange">Date Range:</label>
+                <input id="dateRange" type="text" placeholder="Select a date range">
+            </div>
+        </div>
+        <div class="filter-group button-group">
+            <button class="apply-button" id="applyFiltersBtn">Apply Filters</button>
+            <button class="cancel-button" id="cancelFiltersBtn">Cancel</button>
+        </div>
+        <div class="charts">
+            <div class="chart-container">
+                <canvas id="barChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="lineChart"></canvas>
+            </div>
+        </div>
+    </div>
+   
+    <div id="logoutContainer" class="logout" style="display: none;">
+        <button id="logoutBtn">Logout</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
