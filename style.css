@@ -202,19 +202,14 @@ button:hover {
     margin-top: 20px;
 }
 
-.logoutBtn {
+
+#logoutBtn {
     background: linear-gradient(45deg, #f86ae5, #39d4f7);
     color: white;
     padding: 20px;
     font-size: 25px;
     cursor: pointer;
-    width: 100vw;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
 }
-
 
 #logoutBtn:hover {
     background-color: #ff9ff3, #48dbfb;
