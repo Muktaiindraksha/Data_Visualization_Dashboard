@@ -1,111 +1,178 @@
-document.getElementById('loginBtn').addEventListener('click', () => {
-    const username = document.getElementById('username').value;
-    const email = document.getElementById('Email').value;
-    const contact = document.getElementById('contact').value;
-    const password = document.getElementById('password').value;
+function showSignup() {
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('signupForm').style.display = 'block';
+}
+
+function showLogin() {
+    document.getElementById('signupForm').style.display = 'none';
+    document.getElementById('loginForm').style.display = 'block';
+}
+
+function setCookie(name, value, days) {
+    const date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    document.cookie = `${name}=${encodeURIComponent(value)};expires=${date.toUTCString()};path=/`;
+}
 
 
-    if (username === '' || email === '' || contact === '' || password === '') {
-        alert('Please fill out all the fields before Login.');
+function getCookie(name) {
+    const nameEQ = `${name}=`;
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.startsWith(nameEQ)) return decodeURIComponent(cookie.substring(nameEQ.length));
+    }
+    return null;
+}
+
+
+function signup() {
+    const username = document.getElementById('signupUsername').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value.trim();
+
+    if (!username || !email || !password) {
+        alert('Please fill out all fields.');
         return;
     }
 
+    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!strongPasswordRegex.test(password)) {
+        alert('Password must contain at least 8 characters, including uppercase, lowercase, number, and special character.');
+        return;
+    }
 
-    alert('Logged in successfully!');
-    document.getElementById('authContainer').style.display = 'none';
-    document.getElementById('dashboard').style.display = 'block';
-    document.getElementById('logoutContainer').style.display = 'block';
+    setCookie('signupData', JSON.stringify({ username, email, password }), 7);
+    alert('Signup successful! Please log in.');
+    showLogin();
+}
 
 
-    updateCharts();
-});
+function login() {
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
 
-document.getElementById('contact').addEventListener('input', function (e) {
-    this.value = this.value.replace(/[^0-9]/g, '');
-});
+    if (!username || !password) {
+        alert('Please fill out all fields.');
+        return;
+    }
 
-document.getElementById('logoutBtn').addEventListener('click', () => {
+    const savedData = JSON.parse(getCookie('signupData'));
+
+    if (!savedData) {
+        alert('No user found. Please sign up first.');
+        showSignup();
+        return;
+    }
+
+    if (savedData.username === username && savedData.password === password) {
+        alert(`Welcome , ${username}!`);
+        document.getElementById('authContainer').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        document.getElementById('logoutContainer').style.display = 'block';
+        showAllData();
+    } else {
+        alert('Invalid credentials. Please check your username and password.');
+    }
+}
+
+
+function logout() {
     document.getElementById('authContainer').style.display = 'block';
     document.getElementById('dashboard').style.display = 'none';
     document.getElementById('logoutContainer').style.display = 'none';
-});
-
-document.getElementById('applyFiltersBtn').addEventListener('click', () => {
-    updateCharts();
-});
-
-document.getElementById('cancelFiltersBtn').addEventListener('click', () => {
-    document.getElementById('ageFilter').value = '15-25';
-    document.getElementById('genderFilter').value = 'male';
-    updateCharts();
-});
-
-
-function getFilteredData(ageRange, gender) {
-    const initialData = {
-        '15-25': {
-            male: [30, 20, 40, 50],
-            female: [25, 30, 35, 45],
-        },
-        '>25': {
-            male: [50, 60, 70, 80],
-            female: [55, 65, 75, 85],
-        },
-    };
-
-    return initialData[ageRange][gender];
+    document.getElementById('loginForm').style.display = 'block';
 }
 
+const dataSet = {
+    '15-25': {
+        male: [30, 20, 40, 50],
+        female: [25, 30, 35, 45],
+    },
+    '>25': {
+        male: [50, 60, 70, 80],
+        female: [55, 65, 75, 85],
+    },
+};
 
 const barChartCtx = document.getElementById('barChart').getContext('2d');
 const lineChartCtx = document.getElementById('lineChart').getContext('2d');
 
-const barChart = new Chart(barChartCtx, {
-    type: 'bar',
-    data: {
-        labels: ['Feature A', 'Feature B', 'Feature C', 'Feature D'],
-        datasets: [
-            {
-                label: 'Total Time Spent',
-                data: getFilteredData('15-25', 'male'),
-                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
-            },
-        ],
-    },
-    options: {
-        responsive: true,
-    },
-});
+let barChart, lineChart;
 
-const lineChart = new Chart(lineChartCtx, {
-    type: 'line',
-    data: {
-        labels: ['Feature A', 'Feature B', 'Feature C', 'Feature D'],
-        datasets: [
-            {
-                label: 'Trend Over Time',
-                data: getFilteredData('15-25', 'male'),
-                borderColor: '#FF6384',
-    
-            },
-        ],
-    },
-    options: {
-        responsive: true,
-    },
-});
+function createCharts() {
+    barChart = new Chart(barChartCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Feature A', 'Feature B', 'Feature C', 'Feature D'],
+            datasets: [
+                {
+                    label: 'Total Time Spent',
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+                    data: []
+                },
+            ],
+        },
+    });
 
+    lineChart = new Chart(lineChartCtx, {
+        type: 'line',
+        data: {
+            labels: ['Feature A', 'Feature B', 'Feature C', 'Feature D'],
+            datasets: [
+                {
+                    label: 'Trend Over Time',
+                    borderColor: '#FF6384',
+                    data: []
+                },
+            ],
+        },
+    });
+}
 
-function updateCharts() {
-    const ageRange = document.getElementById('ageFilter').value;
-    const gender = document.getElementById('genderFilter').value;
-    const filteredData = getFilteredData(ageRange, gender);
+createCharts();
 
-    barChart.data.datasets[0].data = filteredData;
+function showAllData() {
+    const allData = [30, 25, 40, 50];
+    updateCharts(allData);
+}
+
+function updateCharts(data) {
+    barChart.data.datasets[0].data = data;
     barChart.update();
 
-    lineChart.data.datasets[0].data = filteredData;
+    lineChart.data.datasets[0].data = data;
     lineChart.update();
+}
+
+function applyFilters() {
+    const age = document.getElementById('ageFilter').value;
+    const gender = document.getElementById('genderFilter').value;
+
+    if (dataSet[age] && dataSet[age][gender]) {
+        const filteredData = dataSet[age][gender];
+        updateCharts(filteredData);
+        alert('Filters applied successfully.');
+        setCookie('filterData', JSON.stringify({ age, gender }), 7);
+    } else {
+        alert('No data available for the selected filter.');
+    }
+}
+
+function cancelFilters() {
+    document.getElementById('ageFilter').value = '15-25';
+    document.getElementById('genderFilter').value = 'male';
+    setCookie('filterData', '', -1);
+    showAllData();
+}
+
+function loadFilterData() {
+    const savedFilters = JSON.parse(getCookie('filterData'));
+    if (savedFilters) {
+        document.getElementById('ageFilter').value = savedFilters.age;
+        document.getElementById('genderFilter').value = savedFilters.gender;
+        applyFilters();
+    }
 }
 
 flatpickr('#dateRange', {
@@ -114,8 +181,3 @@ flatpickr('#dateRange', {
         console.log('Selected Date Range:', selectedDates);
     },
 });
-
-
-
-
-
